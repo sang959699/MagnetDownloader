@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace MagnetDownloader.Model.Json {
     public class DownloadedFile{
         public string FileName { get; set; }
-        public DownloadedFile(string FileName) {
+        public DateTime DownloadedDT { get; set; }
+        public DownloadedFile(string FileName, DateTime DownloadedDT) {
             this.FileName = FileName;
+            this.DownloadedDT = DownloadedDT;
         }
     }
 
