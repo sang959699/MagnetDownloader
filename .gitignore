@@ -1,0 +1,8 @@
+obj
+.vscode
+bin
+Config.json
+DownloadedFile.json
+VideoRegex.json
+publish - Shortcut.lnk
+publish.bat
