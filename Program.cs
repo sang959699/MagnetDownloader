@@ -64,9 +64,12 @@ namespace MagnetDownloader
                         var regex = new Regex(regexString);
                         if (!downloadedFileList.Any(a => a.FileName == item.Title.Text) && regex.IsMatch(item.Title.Text)) {
                             var magnetLink = GetMagnetLink(item.Links.ToArray());
-                            AddDownload(magnetLink.ToString());
-                            SaveDownloadedName(item.Title.Text);
-                            JsonHelper.Print($"Downloading: {item.Title.Text}");
+                            var isResponseSuccess = AddDownload(magnetLink.ToString());
+                            if (isResponseSuccess) {
+                                SaveDownloadedName(item.Title.Text);
+                                JsonHelper.Print($"Downloading: {item.Title.Text}");
+                            }
+                            else { JsonHelper.Print($"AddDownload Failed: {item.Title.Text}"); }
                         }
                     }
                 }
@@ -83,6 +86,7 @@ namespace MagnetDownloader
         }
 
         static bool AddDownload(string url) {
+            var result = false;
             using (HttpClient http = new HttpClient()){
                 var temp = new AriaAddUri();
                 temp.Params.Add("token:3668181199");
@@ -91,8 +95,9 @@ namespace MagnetDownloader
                 });
                 StringContent httpContent = new StringContent(JsonConvert.SerializeObject(temp), System.Text.Encoding.UTF8, "application/json");
                 var response = http.PostAsync(JsonHelper.Config.AriaJsonRpcUrl, httpContent).Result;
+                result = response.IsSuccessStatusCode;
             }
-            return true;
+            return result;
         }
     }
 }
