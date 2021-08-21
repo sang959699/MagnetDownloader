@@ -9,9 +9,9 @@ namespace MagnetDownloader.Helper
 {
     class JsonHelper
     {
-        readonly static string DownloadedFilePath = "DownloadedFile.json";
-        readonly static string ConfigPath = "Config.json";
-        readonly static string VideoRegexPath = "VideoRegex.json";
+        readonly static string DownloadedFilePath = "Config/DownloadedFile.json";
+        readonly static string ConfigPath = "Config/Config.json";
+        readonly static string VideoRegexPath = "Config/VideoRegex.json";
 
         public static void Print(string msg) {
             Console.WriteLine($"{DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")} {msg}");
