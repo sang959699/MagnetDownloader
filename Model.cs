@@ -32,6 +32,7 @@ namespace MagnetDownloader.Model.Json {
 
     public class Config {
         public string AriaJsonRpcUrl { get; set; }
+        public string AriaJsonRpcToken { get; set; }
         public bool RunImmediately { get; set; }
         public string[] RssUrl { get; set; }
     }

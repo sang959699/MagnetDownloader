@@ -89,7 +89,7 @@ namespace MagnetDownloader
             var result = false;
             using (HttpClient http = new HttpClient()){
                 var temp = new AriaAddUri();
-                temp.Params.Add("token:3668181199");
+                temp.Params.Add($"token:{JsonHelper.Config.AriaJsonRpcToken}");
                 temp.Params.Add(new string[] {
                     url
                 });
