@@ -53,9 +53,16 @@ namespace MagnetDownloader
         static void DownloadMagnet() {
             var urlList = JsonHelper.Config.RssUrl;
 
-            foreach(var url in urlList) {
-                using var reader = XmlReader.Create(url);
-                var feed = SyndicationFeed.Load(reader);
+            foreach(var url in urlList) 
+            {
+                SyndicationFeed feed = null;
+                try {
+                    using var reader = XmlReader.Create(url);
+                    feed = SyndicationFeed.Load(reader);
+                } catch (Exception ex) {
+                    Console.WriteLine($"Error occured when accessing {url}, Exception {ex}");
+                    continue;
+                }
 
                 var post = feed.Items.FirstOrDefault();
                 var downloadedFileList = JsonHelper.DownloadedFileList;
