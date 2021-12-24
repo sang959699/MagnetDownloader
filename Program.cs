@@ -57,10 +57,11 @@ namespace MagnetDownloader
             {
                 SyndicationFeed feed = null;
                 try {
+                    Console.WriteLine($"Accessing {url}");
                     using var reader = XmlReader.Create(url);
                     feed = SyndicationFeed.Load(reader);
                 } catch (Exception ex) {
-                    Console.WriteLine($"Error occured when accessing {url}, Exception {ex}");
+                    Console.WriteLine($"Error occured, Exception {ex}");
                     continue;
                 }
 
