@@ -1,8 +1,9 @@
 obj
 .vscode
 bin
-Config.json
+Config.*
 DownloadedFile.json
-VideoRegex.json
+FailedDownloadedFile.json
+VideoRegex.*
 publish - Shortcut.lnk
 publish.bat

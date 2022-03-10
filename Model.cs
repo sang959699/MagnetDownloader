@@ -11,6 +11,16 @@ namespace MagnetDownloader.Model.Json {
             this.DownloadedDT = DownloadedDT;
         }
     }
+    public class FailedDownloadedFile{
+        public string FileName { get; set; }
+        public string MagnetLink { get; set; }
+        public DateTime AttemptDT { get; set; }
+        public FailedDownloadedFile(string FileName, string MagnetLink, DateTime AttemptDT) {
+            this.FileName = FileName;
+            this.MagnetLink = MagnetLink;
+            this.AttemptDT = AttemptDT;
+        }
+    }
 
     public class AriaAddUri {
         [JsonProperty("jsonrpc")]

@@ -10,6 +10,7 @@ namespace MagnetDownloader.Helper
     class JsonHelper
     {
         readonly static string DownloadedFilePath = "Config/DownloadedFile.json";
+        readonly static string FailedDownloadedFilePath = "Config/FailedDownloadedFile.json";
         readonly static string ConfigPath = "Config/Config.json";
         readonly static string VideoRegexPath = "Config/VideoRegex.json";
 
@@ -101,6 +102,39 @@ namespace MagnetDownloader.Helper
                 }
                 return result;
             }
+        }
+        #endregion
+
+        #region FailedDownloadedFile
+        public static List<FailedDownloadedFile> FailedDownloadedFileList {
+            get {
+                var result =  new List<FailedDownloadedFile>();
+                try {
+                    var json = File.ReadAllText(FailedDownloadedFilePath);
+
+                    result = JsonConvert.DeserializeObject<List<FailedDownloadedFile>>(json);
+                    if (result == null)  return new List<FailedDownloadedFile>();
+                } catch (Exception ex) {
+                    Print($"Error when extracting FailedDownloadedFileList, Exception: {ex}");
+                }
+                return result;
+            }
+        }
+    
+        public static bool SaveFailedDownloadedFile(string fileName, string magnetLink) {
+            var temp = FailedDownloadedFileList;
+            if (!temp.Exists(e => e.FileName == fileName)) temp.Add(new FailedDownloadedFile(fileName, magnetLink, DateTime.Now));
+
+            File.WriteAllText(FailedDownloadedFilePath, JsonConvert.SerializeObject(temp));
+            return true;
+        }
+
+        public static bool DeleteFailedDownloadedFile(string fileName) {
+            var temp = FailedDownloadedFileList;
+            temp.RemoveAll(r => r.FileName == fileName);
+
+            File.WriteAllText(FailedDownloadedFilePath, JsonConvert.SerializeObject(temp));
+            return true;
         }
         #endregion
     }
