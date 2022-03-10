@@ -20,15 +20,15 @@ namespace MagnetDownloader.Helper
 
         public static void JsonInit() {
             if (!File.Exists(DownloadedFilePath)) {
-                File.Create(DownloadedFilePath);
                 File.WriteAllText(DownloadedFilePath, "[]");
             }
+            if (!File.Exists(FailedDownloadedFilePath)) {
+                File.WriteAllText(FailedDownloadedFilePath, "[]");
+            }
             if (!File.Exists(ConfigPath)) {
-                File.Create(ConfigPath);
                 File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(new Config()));
             }
             if (!File.Exists(VideoRegexPath)) {
-                File.Create(VideoRegexPath);
                 File.WriteAllText(VideoRegexPath, "[]");
             }
         }
