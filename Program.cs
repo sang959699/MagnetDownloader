@@ -66,11 +66,10 @@ namespace MagnetDownloader
                 }
 
                 var post = feed.Items.FirstOrDefault();
-                var downloadedFileList = JsonHelper.DownloadedFileList;
                 foreach(var item in feed.Items) {
                     foreach(var regexString in JsonHelper.VideoRegex) {
                         var regex = new Regex(regexString);
-                        if (!downloadedFileList.Any(a => a.FileName == item.Title.Text) && regex.IsMatch(item.Title.Text)) {
+                        if (!JsonHelper.DownloadedFileList.Any(a => a.FileName == item.Title.Text) && regex.IsMatch(item.Title.Text)) {
                             var magnetLink = GetMagnetLink(item.Links.ToArray()).ToString();
                             var isResponseSuccess = AddDownload(magnetLink);
                             if (isResponseSuccess) {
