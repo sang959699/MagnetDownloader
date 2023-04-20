@@ -8,6 +8,7 @@ using System.Xml;
 using MagnetDownloader.Helper;
 using MagnetDownloader.Model.Json;
 using Newtonsoft.Json;
+using System.Web;
 
 namespace MagnetDownloader
 {
@@ -69,17 +70,18 @@ namespace MagnetDownloader
                 foreach(var item in feed.Items) {
                     foreach(var regexString in JsonHelper.VideoRegex) {
                         var regex = new Regex(regexString);
-                        if (!JsonHelper.DownloadedFileList.Any(a => a.FileName == item.Title.Text) && regex.IsMatch(item.Title.Text)) {
+                        string titleText = HttpUtility.HtmlDecode(item.Title.Text);
+                        if (!JsonHelper.DownloadedFileList.Any(a => a.FileName == titleText) && regex.IsMatch(titleText)) {
                             var magnetLink = GetMagnetLink(item.Links.ToArray()).ToString();
                             var isResponseSuccess = AddDownload(magnetLink);
                             if (isResponseSuccess) {
-                                JsonHelper.DeleteFailedDownloadedFile(item.Title.Text);
-                                SaveDownloadedName(item.Title.Text);
-                                JsonHelper.Print($"Downloading: {item.Title.Text}");
+                                JsonHelper.DeleteFailedDownloadedFile(titleText);
+                                SaveDownloadedName(HttpUtility.HtmlDecode(titleText));
+                                JsonHelper.Print($"Downloading: {titleText}");
                             }
                             else {
-                                JsonHelper.SaveFailedDownloadedFile(item.Title.Text, magnetLink);
-                                JsonHelper.Print($"AddDownload Failed: {item.Title.Text}");
+                                JsonHelper.SaveFailedDownloadedFile(titleText, magnetLink);
+                                JsonHelper.Print($"AddDownload Failed: {titleText}");
                             }
                         }
                     }
