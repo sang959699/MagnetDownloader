@@ -51,7 +51,7 @@ namespace MagnetDownloader.Helper
     
         public static bool SaveDownloadedFile(string fileName) {
             var temp = DownloadedFileList;
-            temp.Add(new DownloadedFile(fileName, DateTime.Now));
+            temp.Insert(0, new DownloadedFile(fileName, DateTime.Now));
 
             File.WriteAllText(DownloadedFilePath, JsonConvert.SerializeObject(temp));
             return true;
