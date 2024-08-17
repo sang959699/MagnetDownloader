@@ -7,3 +7,4 @@ FailedDownloadedFile.json
 VideoRegex.*
 publish - Shortcut.lnk
 publish.bat
+/.vs/MagnetDownloader

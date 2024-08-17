@@ -49,9 +49,9 @@ namespace MagnetDownloader.Helper
             }
         }
     
-        public static bool SaveDownloadedFile(string fileName) {
+        public static bool SaveDownloadedFile(string fileName, string source, string downloadPath) {
             var temp = DownloadedFileList;
-            temp.Insert(0, new DownloadedFile(fileName, DateTime.Now));
+            temp.Insert(0, new DownloadedFile(fileName, DateTime.Now, source, downloadPath));
 
             File.WriteAllText(DownloadedFilePath, JsonConvert.SerializeObject(temp));
             return true;
@@ -88,14 +88,23 @@ namespace MagnetDownloader.Helper
         #endregion
 
         #region VideoRegex
-        public static List<string> VideoRegex {
+        public static List<VideoRegex> VideoRegexList {
             get {
-                var result = new List<string>();
+                var result = new List<VideoRegex>();
                 try {
                     var json = File.ReadAllText(VideoRegexPath);
 
-                    result = JsonConvert.DeserializeObject<List<string>>(json);
-                    if (result == null)  return new List<string>();
+                    var tempResult = JsonConvert.DeserializeObject<List<string>>(json);
+                    if (tempResult != null) {
+                        tempResult.ForEach(f => {
+                            if (f.Contains(Config.DownloadPathDelimiter)) {
+                                var splitted = f.Split(Config.DownloadPathDelimiter);
+                                result.Add(new VideoRegex(splitted[0], splitted[1]));
+                            } else {
+                                result.Add(new VideoRegex(f));
+                            }
+                        });
+                    }
                 }
                 catch (Exception ex) {
                     Print($"Error when extracting VideoRegex, Exception: {ex}");
@@ -121,9 +130,9 @@ namespace MagnetDownloader.Helper
             }
         }
     
-        public static bool SaveFailedDownloadedFile(string fileName, string magnetLink) {
+        public static bool SaveFailedDownloadedFile(string fileName, string magnetLink, string downloadPath, string source) {
             var temp = FailedDownloadedFileList;
-            if (!temp.Exists(e => e.FileName == fileName)) temp.Add(new FailedDownloadedFile(fileName, magnetLink, DateTime.Now));
+            if (!temp.Exists(e => e.FileName == fileName)) temp.Add(new FailedDownloadedFile(fileName, magnetLink, DateTime.Now, downloadPath, source));
 
             File.WriteAllText(FailedDownloadedFilePath, JsonConvert.SerializeObject(temp));
             return true;

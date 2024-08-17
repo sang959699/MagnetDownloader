@@ -9,6 +9,7 @@ using MagnetDownloader.Helper;
 using MagnetDownloader.Model.Json;
 using Newtonsoft.Json;
 using System.Web;
+using System.Collections.Generic;
 
 namespace MagnetDownloader
 {
@@ -68,19 +69,19 @@ namespace MagnetDownloader
 
                 var post = feed.Items.FirstOrDefault();
                 foreach(var item in feed.Items) {
-                    foreach(var regexString in JsonHelper.VideoRegex) {
-                        var regex = new Regex(regexString);
+                    foreach(var regexData in JsonHelper.VideoRegexList) {
+                        var regex = new Regex(regexData.FileRegex);
                         string titleText = HttpUtility.HtmlDecode(item.Title.Text);
                         if (!JsonHelper.DownloadedFileList.Any(a => a.FileName == titleText) && regex.IsMatch(titleText)) {
                             var magnetLink = GetMagnetLink(item.Links.ToArray()).ToString();
-                            var isResponseSuccess = AddDownload(magnetLink);
+                            var isResponseSuccess = AddDownload(magnetLink, regexData.DownloadPath);
                             if (isResponseSuccess) {
                                 JsonHelper.DeleteFailedDownloadedFile(titleText);
-                                SaveDownloadedName(HttpUtility.HtmlDecode(titleText));
+                                SaveDownloadedName(HttpUtility.HtmlDecode(titleText), url, regexData.DownloadPath);
                                 JsonHelper.Print($"Downloading: {titleText}");
                             }
                             else {
-                                JsonHelper.SaveFailedDownloadedFile(titleText, magnetLink);
+                                JsonHelper.SaveFailedDownloadedFile(titleText, magnetLink, regexData.DownloadPath, url);
                                 JsonHelper.Print($"AddDownload Failed: {titleText}");
                             }
                         }
@@ -90,10 +91,10 @@ namespace MagnetDownloader
             var FailedDownloadedFileList = JsonHelper.FailedDownloadedFileList;
             JsonHelper.Print($"Scan Failed Download File List, Count: {FailedDownloadedFileList.Count}");
             foreach(var item in FailedDownloadedFileList) {
-                var isResponseSuccess = AddDownload(item.MagnetLink);
+                var isResponseSuccess = AddDownload(item.MagnetLink, item.DownloadPath);
                 if (isResponseSuccess) {
                     JsonHelper.DeleteFailedDownloadedFile(item.FileName);
-                    SaveDownloadedName(item.FileName);
+                    SaveDownloadedName(item.FileName, item.Source, item.DownloadPath);
                     JsonHelper.Print($"Downloading: {item.FileName}");
                 }
                 else JsonHelper.Print($"AddDownload Failed: {item.FileName}");
@@ -104,12 +105,12 @@ namespace MagnetDownloader
             return links.Where(w => w.MediaType == "application/x-bittorrent").Select(s => s.Uri).FirstOrDefault();
         }
 
-        static bool SaveDownloadedName(string name){
-            JsonHelper.SaveDownloadedFile(name);
+        static bool SaveDownloadedName(string name, string source, string downloadPath){
+            JsonHelper.SaveDownloadedFile(name, source, downloadPath);
             return true;
         }
 
-        static bool AddDownload(string url) {
+        static bool AddDownload(string url, string downloadPath) {
             var result = false;
             try {
                 using (HttpClient http = new HttpClient()){
@@ -118,6 +119,7 @@ namespace MagnetDownloader
                     temp.Params.Add(new string[] {
                         url
                     });
+                    if (downloadPath != null) temp.Params.Add(new Dictionary<string, string> {{ "dir", JsonHelper.Config.DownloadPathPrefix + downloadPath }});
                     StringContent httpContent = new StringContent(JsonConvert.SerializeObject(temp), System.Text.Encoding.UTF8, "application/json");
                     var response = http.PostAsync(JsonHelper.Config.AriaJsonRpcUrl, httpContent).Result;
                     result = response.IsSuccessStatusCode;
