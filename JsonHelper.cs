@@ -85,6 +85,21 @@ namespace MagnetDownloader.Helper
             File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(model));
             return true;
         }
+
+        public static DateTime GetLatestSuccessfulRunDt() {
+            var result = Config.LatestSuccessfulRunDt;
+            if (result == null) Print($"No Latest Download Config");
+            else Print($"Latest Download DT: {Config.LatestSuccessfulRunDt:dd/MM/yyyy HH:mm:ss}");
+            return Config.LatestSuccessfulRunDt ?? DateTime.Now;
+        }
+
+        public static bool SaveLatestSuccessfulRunDt() {
+            var model = Config;
+            model.LatestSuccessfulRunDt = DateTime.Now;
+            File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(model));
+            Print($"Latest Download DT Saved: {DateTime.Now:dd/MM/yyyy HH:mm:ss}");
+            return true;
+        }
         #endregion
 
         #region VideoRegex

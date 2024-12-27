@@ -67,5 +67,6 @@ namespace MagnetDownloader.Model.Json {
         public string[] RssUrl { get; set; }
         public string DownloadPathPrefix { get; set; }
         public string DownloadPathDelimiter { get; set; }
+        public DateTime? LatestSuccessfulRunDt { get; set; }
     }
 }

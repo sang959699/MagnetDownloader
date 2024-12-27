@@ -54,25 +54,29 @@ namespace MagnetDownloader
 
         static void DownloadMagnet() {
             var urlList = JsonHelper.Config.RssUrl;
+            var failedUrlList = new List<string>();
+            var latestDownloadedDt = JsonHelper.GetLatestSuccessfulRunDt();
 
-            foreach(var url in urlList) 
-            {
+            foreach(var url in urlList) {
                 SyndicationFeed feed = null;
                 try {
-                    Console.WriteLine($"Accessing {url}");
+                    JsonHelper.Print($"Accessing {url}");
                     using var reader = XmlReader.Create(url);
                     feed = SyndicationFeed.Load(reader);
+                    if (!feed.Items.Any()) throw new Exception("0 feed in this url");
                 } catch (Exception ex) {
-                    Console.WriteLine($"Error occured, Exception {ex}");
+                    JsonHelper.Print($"Error occured, Exception {ex}");
+                    failedUrlList.Add(url);
                     continue;
                 }
 
-                var post = feed.Items.FirstOrDefault();
+                feed.Items = feed.Items.Where(w => w.PublishDate >= latestDownloadedDt);
+                JsonHelper.Print($"Feed Items Count: {feed.Items.Count()}");
                 foreach(var item in feed.Items) {
                     foreach(var regexData in JsonHelper.VideoRegexList) {
                         var regex = new Regex(regexData.FileRegex);
                         string titleText = HttpUtility.HtmlDecode(item.Title.Text);
-                        if (!JsonHelper.DownloadedFileList.Any(a => a.FileName == titleText) && regex.IsMatch(titleText)) {
+                        if (regex.IsMatch(titleText) && !JsonHelper.DownloadedFileList.Any(a => a.FileName == titleText)) {
                             var magnetLink = GetMagnetLink(item.Links.ToArray()).ToString();
                             var isResponseSuccess = AddDownload(magnetLink, regexData.DownloadPath);
                             if (isResponseSuccess) {
@@ -84,6 +88,7 @@ namespace MagnetDownloader
                                 JsonHelper.SaveFailedDownloadedFile(titleText, magnetLink, regexData.DownloadPath, url);
                                 JsonHelper.Print($"AddDownload Failed: {titleText}");
                             }
+                            break;
                         }
                     }
                 }
@@ -99,6 +104,7 @@ namespace MagnetDownloader
                 }
                 else JsonHelper.Print($"AddDownload Failed: {item.FileName}");
             }
+            if (failedUrlList.Count != urlList.Length) JsonHelper.SaveLatestSuccessfulRunDt();
         }
 
         static Uri GetMagnetLink(SyndicationLink[] links){
