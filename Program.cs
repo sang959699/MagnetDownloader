@@ -56,6 +56,7 @@ namespace MagnetDownloader
             var urlList = JsonHelper.Config.RssUrl;
             var failedUrlList = new List<string>();
             var latestDownloadedDt = JsonHelper.GetLatestSuccessfulRunDt();
+            var searchAll = JsonHelper.Config.SearchAll;
 
             foreach(var url in urlList) {
                 SyndicationFeed feed = null;
@@ -70,7 +71,7 @@ namespace MagnetDownloader
                     continue;
                 }
 
-                feed.Items = feed.Items.Where(w => w.PublishDate >= latestDownloadedDt);
+                if (!searchAll) feed.Items = feed.Items.Where(w => w.PublishDate >= latestDownloadedDt);
                 JsonHelper.Print($"Feed Items Count: {feed.Items.Count()}");
                 foreach(var item in feed.Items) {
                     foreach(var regexData in JsonHelper.VideoRegexList) {
@@ -105,6 +106,7 @@ namespace MagnetDownloader
                 else JsonHelper.Print($"AddDownload Failed: {item.FileName}");
             }
             if (failedUrlList.Count != urlList.Length) JsonHelper.SaveLatestSuccessfulRunDt();
+            if (searchAll) JsonHelper.DisableSearchAll();
         }
 
         static Uri GetMagnetLink(SyndicationLink[] links){

@@ -68,5 +68,6 @@ namespace MagnetDownloader.Model.Json {
         public string DownloadPathPrefix { get; set; }
         public string DownloadPathDelimiter { get; set; }
         public DateTime? LatestSuccessfulRunDt { get; set; }
+        public bool SearchAll { get; set; }
     }
 }

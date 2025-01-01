@@ -86,6 +86,13 @@ namespace MagnetDownloader.Helper
             return true;
         }
 
+        public static bool DisableSearchAll() {
+            var model = Config;
+            model.SearchAll = false;
+            File.WriteAllText(ConfigPath, JsonConvert.SerializeObject(model));
+            return true;
+        }
+
         public static DateTime GetLatestSuccessfulRunDt() {
             var result = Config.LatestSuccessfulRunDt;
             if (result == null) Print($"No Latest Download Config");
