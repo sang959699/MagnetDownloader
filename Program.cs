@@ -57,6 +57,7 @@ namespace MagnetDownloader
             var failedUrlList = new List<string>();
             var latestDownloadedDt = JsonHelper.GetLatestSuccessfulRunDt();
             var searchAll = JsonHelper.Config.SearchAll;
+            JsonHelper.Print("searchAll: " + searchAll);
 
             foreach(var url in urlList) {
                 SyndicationFeed feed = null;
