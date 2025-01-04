@@ -72,6 +72,7 @@ namespace MagnetDownloader
                     continue;
                 }
 
+                // always search all
                 if (!searchAll) feed.Items = feed.Items.Where(w => w.PublishDate >= latestDownloadedDt);
                 JsonHelper.Print($"Feed Items Count: {feed.Items.Count()}");
                 foreach(var item in feed.Items) {
@@ -107,7 +108,7 @@ namespace MagnetDownloader
                 else JsonHelper.Print($"AddDownload Failed: {item.FileName}");
             }
             if (failedUrlList.Count != urlList.Length) JsonHelper.SaveLatestSuccessfulRunDt();
-            if (searchAll) JsonHelper.DisableSearchAll();
+            //if (searchAll) JsonHelper.DisableSearchAll();
         }
 
         static Uri GetMagnetLink(SyndicationLink[] links){
